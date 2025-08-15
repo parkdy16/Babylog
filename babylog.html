@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>아기 기록 (Nest Hub)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+    h1, h2 { font-size: 3em; }
+    button { width: 200px; height: 100px; font-size: 2em; margin: 10px; }
+    .section { margin: 40px 0; }
+    .btn-group { display: flex; flex-wrap: wrap; justify-content: center; }
+  </style>
+</head>
+<body>
+  <h1>아기 기록</h1>
+
+  <div class="section">
+    <h2>기저귀</h2>
+    <div class="btn-group">
+      <button onclick="logEvent('대변', '1')">대변 1</button>
+      <button onclick="logEvent('대변', '2')">대변 2</button>
+      <button onclick="logEvent('대변', '3')">대변 3</button>
+      <button onclick="logEvent('대변', '4')">대변 4</button>
+      <button onclick="logEvent('대변', '5')">대변 5</button>
+      <button onclick="logEvent('소변')">소변</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>수유</h2>
+    <div class="btn-group">
+      <button onclick="logEvent('모유', '50')">모유 50ml</button>
+      <button onclick="logEvent('모유', '100')">모유 100ml</button>
+      <button onclick="logEvent('모유', '150')">모유 150ml</button>
+      <button onclick="logEvent('분유', '50')">분유 50ml</button>
+      <button onclick="logEvent('분유', '100')">분유 100ml</button>
+      <button onclick="logEvent('분유', '150')">분유 150ml</button>
+    </div>
+  </div>
+
+  <script>
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw5KSOrKDWhJtpe_Qfg4iGsMfIYIcJbx6EV3sZES3PNkOBeBENzgawrfAWCH-ATupkh/exec';
+
+    function logEvent(type, detail = '') {
+      const timestamp = new Date().toLocaleString();
+      const data = { timestamp, type, amount: detail };
+
+      fetch(WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(() => alert(`${type} ${detail ? detail : ''} 기록 완료`))
+      .catch(err => alert('기록 실패: ' + err));
+    }
+  </script>
+</body>
+</html>

@@ -1,59 +1,51 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>아기 기록 (Nest Hub)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baby Log</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-    h1, h2 { font-size: 3em; }
-    button { width: 200px; height: 100px; font-size: 2em; margin: 10px; }
-    .section { margin: 40px 0; }
-    .btn-group { display: flex; flex-wrap: wrap; justify-content: center; }
+    body { font-family: sans-serif; text-align: center; padding: 50px; }
+    button { font-size: 24px; padding: 20px; margin: 10px; width: 250px; }
   </style>
 </head>
 <body>
-  <h1>아기 기록</h1>
-
-  <div class="section">
-    <h2>기저귀</h2>
-    <div class="btn-group">
-      <button onclick="logEvent('대변', '1')">대변 1</button>
-      <button onclick="logEvent('대변', '2')">대변 2</button>
-      <button onclick="logEvent('대변', '3')">대변 3</button>
-      <button onclick="logEvent('대변', '4')">대변 4</button>
-      <button onclick="logEvent('대변', '5')">대변 5</button>
-      <button onclick="logEvent('소변')">소변</button>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2>수유</h2>
-    <div class="btn-group">
-      <button onclick="logEvent('모유', '50')">모유 50ml</button>
-      <button onclick="logEvent('모유', '100')">모유 100ml</button>
-      <button onclick="logEvent('모유', '150')">모유 150ml</button>
-      <button onclick="logEvent('분유', '50')">분유 50ml</button>
-      <button onclick="logEvent('분유', '100')">분유 100ml</button>
-      <button onclick="logEvent('분유', '150')">분유 150ml</button>
-    </div>
-  </div>
-
+  <h1>Baby Log</h1>
+  
+  <h2>기저귀</h2>
+  <button onclick="logPoop('대변 설사')">대변 설사</button>
+  <button onclick="logPoop('대변 묽은똥')">대변 묽은똥</button>
+  <button onclick="logPoop('대변 보통')">대변 보통</button>
+  <button onclick="logUrine()">소변</button>
+  
+  <h2>수유</h2>
+  <button onclick="logMilk('모유')">모유</button>
+  <button onclick="logMilk('분유')">분유</button>
+  
   <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw5KSOrKDWhJtpe_Qfg4iGsMfIYIcJbx6EV3sZES3PNkOBeBENzgawrfAWCH-ATupkh/exec';
+    const sheetUrl = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
 
-    function logEvent(type, detail = '') {
-      const timestamp = new Date().toLocaleString();
-      const data = { timestamp, type, amount: detail };
+    function sendToSheet(type, value='') {
+      fetch(sheetUrl + `?type=${encodeURIComponent(type)}&value=${encodeURIComponent(value)}`)
+        .then(res => console.log('Logged:', type, value))
+        .catch(err => console.error(err));
+    }
 
-      fetch(WEB_APP_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      })
-      .then(() => alert(`${type} ${detail ? detail : ''} 기록 완료`))
-      .catch(err => alert('기록 실패: ' + err));
+    function logPoop(kind) {
+      sendToSheet(kind);
+      alert(kind + ' 기록됨');
+    }
+
+    function logUrine() {
+      sendToSheet('소변');
+      alert('소변 기록됨');
+    }
+
+    function logMilk(kind) {
+      let amount = prompt(kind + ' 몇 ml?', '');
+      if (amount) {
+        sendToSheet(kind, amount);
+        alert(kind + ' ' + amount + 'ml 기록됨');
+      }
     }
   </script>
 </body>

@@ -36,48 +36,34 @@
 </div>
 
 <script>
-  const webAppUrl = 'https://script.google.com/macros/s/AKfycbxBd-QDvPIgA82p39uHqILROEjzuJYvnFokcD99r7SAFVEg62ddzeYuIUvK_ogGyY9ckA/exec'; // 여기에 Apps Script Web App URL 넣기
+const webAppUrl = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbxBd-QDvPIgA82p39uHqILROEjzuJYvnFokcD99r7SAFVEg62ddzeYuIUvK_ogGyY9ckA/exec; // Apps Script URL
 
-  function logData(type, subtype) {
-    const data = {
-      type: type,
-      subtype: subtype, // Apps Script에서 받는 키
-      ml: '',
-      consistency: '',  // Apps Script에서 받는 키
-    };
-    sendToSheet(data);
-  }
-
-  function logMilk(milkType) {
-    const mlInput = document.getElementById('milkAmount').value;
-    if (!mlInput) {
-      alert('수유량을 입력하세요.');
-      return;
-    }
-    const data = {
-      type: milkType,
-      subtype: '',       // 대변 없으므로 빈값
-      ml: mlInput,
-      consistency: '',   // 필요없음
-    };
-    sendToSheet(data);
-    document.getElementById('milkAmount').value = '';
-  }
-
-  function sendToSheet(data) {
-    fetch(webAppUrl, {
+async function sendToSheet(data) {
+  try {
+    const res = await fetch(webAppUrl, {
       method: 'POST',
-      body: JSON.stringify(data),
-      headers: { 'Content-Type': 'application/json' }
-    })
-    .then(res => res.json())
-    .then(res => console.log('Sheet response:', res))
-    .catch(err => console.error(err));
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    console.log('Sheet response:', result);
+    alert('기록 완료!');
+  } catch (err) {
+    console.error(err);
+    alert('기록 실패! 콘솔 확인');
   }
+}
+
+function logData(type, subtype) {
+  sendToSheet({ type, subtype, ml: '', consistency: '' });
+}
+
+function logMilk(milkType) {
+  const mlInput = document.getElementById('milkAmount').value;
+  if (!mlInput) { alert('수유량 입력!'); return; }
+  sendToSheet({ type: milkType, subtype: '', ml: mlInput, consistency: '' });
+  document.getElementById('milkAmount').value = '';
+}
 </script>
 </body>
 </html>
-
-
-
-

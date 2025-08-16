@@ -16,7 +16,7 @@
     margin-bottom: 20px;
   }
   button {
-    font-size: 1.5em;
+    font-size: 1.8em; /* 버튼 글자 크게 */
     margin: 10px;
     padding: 15px 25px;
     cursor: pointer;
@@ -26,7 +26,7 @@
     color: white;
   }
   input[type="number"] {
-    font-size: 1.5em;
+    font-size: 1.8em; /* 입력창 글자 크게 */
     width: 120px;
     padding: 5px;
     margin: 10px;
@@ -34,33 +34,36 @@
     border: 1px solid #ccc;
     text-align: center;
   }
+  .input-section, .poop-section, .pee-section {
+    margin-bottom: 20px;
+  }
 </style>
 </head>
 <body>
 <h1>태하기록</h1>
 
 <!-- 모유/분유 입력 -->
-<div>
+<div class="input-section">
   <input type="number" id="milkAmount" placeholder="ml">
   <button onclick="logMilk('모유')">모유 수유</button>
   <button onclick="logMilk('분유')">분유 수유</button>
 </div>
 
 <!-- 대변 버튼 -->
-<div>
+<div class="poop-section">
   <button onclick="logData('대변', '설사')">대변: 설사</button>
   <button onclick="logData('대변', '묽은똥')">대변: 묽은똥</button>
   <button onclick="logData('대변', '보통')">대변: 보통</button>
 </div>
 
 <!-- 소변 버튼 -->
-<div>
+<div class="pee-section">
   <button onclick="logData('소변', '')">소변</button>
 </div>
 
 <script>
   // Google Apps Script Web App URL
-  const sheetUrl = 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbw5KSOrKDWhJtpe_Qfg4iGsMfIYIcJbx6EV3sZES3PNkOBeBENzgawrfAWCH-ATupkh/exec/exec';
+  const sheetUrl = 'https://script.google.com/macros/s/AKfycbw5KSOrKDWhJtpe_Qfg4iGsMfIYIcJbx6EV3sZES3PNkOBeBENzgawrfAWCH-ATupkh/exec';
 
   function logData(type, subtype) {
     const timestamp = new Date().toLocaleString();

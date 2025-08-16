@@ -1,52 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
   <title>Baby Log</title>
-  <style>
-    body { font-family: sans-serif; text-align: center; padding: 50px; }
-    button { font-size: 24px; padding: 20px; margin: 10px; width: 250px; }
-  </style>
-</head>
-<body>
-  <h1>Baby Log</h1>
-  
-  <h2>기저귀</h2>
-  <button onclick="logPoop('대변 설사')">대변 설사</button>
-  <button onclick="logPoop('대변 묽은똥')">대변 묽은똥</button>
-  <button onclick="logPoop('대변 보통')">대변 보통</button>
-  <button onclick="logUrine()">소변</button>
-  
-  <h2>수유</h2>
-  <button onclick="logMilk('모유')">모유</button>
-  <button onclick="logMilk('분유')">분유</button>
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <script>
-    const sheetUrl = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbw5KSOrKDWhJtpe_Qfg4iGsMfIYIcJbx6EV3sZES3PNkOBeBENzgawrfAWCH-ATupkh/exec"; // Apps Script Web App URL
 
-    function sendToSheet(type, value='') {
-      fetch(sheetUrl + `?type=${encodeURIComponent(type)}&value=${encodeURIComponent(value)}`)
-        .then(res => console.log('Logged:', type, value))
-        .catch(err => console.error(err));
+    function sendData(type, stoolType = "", ml = "") {
+      const now = new Date();
+      const time = now.toLocaleString('ko-KR', { hour12: false });
+
+      const data = {
+        time: time,
+        type: type,
+        ml: ml,
+        stool: stoolType,
+        urine: type === "소변" ? "O" : ""
+      };
+
+      fetch(SHEET_URL, {
+        method: "POST",
+        body: JSON.stringify(data)
+      })
+      .then(response => alert("기록 완료!"))
+      .catch(err => alert("기록 실패: " + err));
     }
 
-    function logPoop(kind) {
-      sendToSheet(kind);
-      alert(kind + ' 기록됨');
+    function recordStool(stoolType) {
+      sendData("대변", stoolType);
     }
 
-    function logUrine() {
-      sendToSheet('소변');
-      alert('소변 기록됨');
+    function recordUrine() {
+      sendData("소변");
     }
 
-    function logMilk(kind) {
-      let amount = prompt(kind + ' 몇 ml?', '');
-      if (amount) {
-        sendToSheet(kind, amount);
-        alert(kind + ' ' + amount + 'ml 기록됨');
+    function recordMilkInput(type) {
+      const input = document.getElementById(type + "-ml");
+      const ml = input.value;
+      if (ml !== "" && !isNaN(ml)) {
+        sendData(type, "", ml);
+        input.value = "";
+      } else {
+        alert("숫자를 입력해주세요.");
       }
     }
   </script>
+  <style>
+    body { text-align: center; font-family: sans-serif; background: #f0f0f0; margin: 0; padding: 0; }
+    h1 { font-size: 6vw; margin-top: 2vh; }
+    h2 { font-size: 5vw; margin-top: 3vh; }
+    button { font-size: 5vw; margin: 1.5vh; padding: 3vh 5vw; border-radius: 2vw; border: none; color: #fff; box-shadow: 2px 2px 5px #aaa; }
+    button.stool { background-color: #f39c12; }      /* 대변 - 주황색 */
+    button.urine { background-color: #3498db; }     /* 소변 - 파란색 */
+    button.milk { background-color: #2ecc71; }      /* 수유 - 초록색 */
+    input { font-size: 4vw; width: 20vw; margin-left: 2vw; padding: 1vh; border-radius: 1vw; border: 1px solid #ccc; }
+    .milk-entry { margin-bottom: 3vh; display: flex; align-items: center; justify-content: center; }
+    .container { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>태하 수유 및 배변 기록</h1>
+    
+    <h2>대변</h2>
+    <button class="stool" onclick="recordStool('보통')">대변 보통</button>
+    <button class="stool" onclick="recordStool('묽은똥')">대변 묽은똥</button>
+    <button class="stool" onclick="recordStool('설사')">대변 설사</button>
+    
+    <h2>소변</h2>
+    <button class="urine" onclick="recordUrine()">소변 기록</button>
+    
+    <h2>수유</h2>
+    <div class="milk-entry">
+      모유: <input type="number" id="모유-ml" placeholder="ml">
+      <button class="milk" onclick="recordMilkInput('모유')">기록</button>
+    </div>
+    <div class="milk-entry">
+      분유: <input type="number" id="분유-ml" placeholder="ml">
+      <button class="milk" onclick="recordMilkInput('분유')">기록</button>
+    </div>
+  </div>
 </body>
 </html>

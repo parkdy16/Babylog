@@ -34,11 +34,11 @@
     text-align: center;
   }
   /* 버튼 색상 */
-  .milk-mom { background-color: #FF69B4; }      /* 분홍색 */
-  .milk-formula { background-color: #2196F3; }  /* 파란색 */
-  .poop-light { background-color: #B0B0B0; color: black; } /* 회색 */
-  .poop-dark { background-color: #505050; }     /* 진회색 */
-  .poop-brown { background-color: #8B4513; }    /* 갈색 */
+  .milk-mom { background-color: #FF69B4; }       /* 분홍색 */
+  .milk-formula { background-color: #2196F3; }   /* 파란색 */
+  .poop-light { background-color: #B0B0B0; color: black; }  /* 회색 */
+  .poop-dark { background-color: #505050; }      /* 진회색 */
+  .poop-brown { background-color: #8B4513; }     /* 갈색 */
   .pee { background-color: #FFEB3B; color: black; } /* 노란색 */
 </style>
 </head>
@@ -49,4 +49,62 @@
 <div>
   <input type="number" id="milkAmount" placeholder="수유량 (ml)">
   <button class="milk-mom" onclick="logMilk('모유')">모유 수유</button>
-  <button class="milk-for
+  <button class="milk-formula" onclick="logMilk('분유')">분유 수유</button>
+</div>
+
+<!-- 대변 버튼 -->
+<div>
+  <button class="poop-light" onclick="logData('대변','설사')">대변: 설사</button>
+  <button class="poop-dark" onclick="logData('대변','묽은똥')">대변: 묽은똥</button>
+  <button class="poop-brown" onclick="logData('대변','보통')">대변: 보통</button>
+</div>
+
+<!-- 소변 버튼 -->
+<div>
+  <button class="pee" onclick="logData('소변','')">소변</button>
+</div>
+
+<script>
+  // Google Apps Script Web App URL
+  const sheetUrl = 'https://script.google.com/macros/s/AKfycbw5KSOrKDWhJtpe_Qfg4iGsMfIYIcJbx6EV3sZES3PNkOBeBENzgawrfAWCH-ATupkh/exec';
+
+  function logData(type, subtype) {
+    const timestamp = new Date().toLocaleString();
+    const data = {
+      time: timestamp,
+      type: type,
+      ml: '',
+      poopType: subtype,
+      pee: type === '소변' ? 'O' : ''
+    };
+    sendToSheet(data);
+  }
+
+  function logMilk(milkType) {
+    const mlInput = document.getElementById('milkAmount').value;
+    if(!mlInput) {
+      alert('수유량을 입력하세요.');
+      return;
+    }
+    const timestamp = new Date().toLocaleString();
+    const data = {
+      time: timestamp,
+      type: milkType,
+      ml: mlInput,
+      poopType: '',
+      pee: ''
+    };
+    sendToSheet(data);
+    document.getElementById('milkAmount').value = '';
+  }
+
+  function sendToSheet(data) {
+    const url = `${sheetUrl}?sheetId=1gb6GQ3EuLX7lHDN7RgCQc4OYKYwOAcdM_UreK6X2uKs&time=${encodeURIComponent(data.time)}&type=${encodeURIComponent(data.type)}&ml=${encodeURIComponent(data.ml)}&poopType=${encodeURIComponent(data.poopType)}&pee=${encodeURIComponent(data.pee)}`;
+    fetch(url)
+      .then(response => response.text())
+      .then(text => console.log('Sheet response:', text))
+      .catch(err => console.error(err));
+  }
+</script>
+</body>
+</html>
